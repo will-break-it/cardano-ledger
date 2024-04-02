@@ -150,6 +150,7 @@ data ConwayTxBodyRaw era = ConwayTxBodyRaw
   , ctbrProposalProcedures :: !(OSet.OSet (ProposalProcedure era))
   , ctbrCurrentTreasuryValue :: !(StrictMaybe Coin)
   , ctbrTreasuryDonation :: !Coin
+  , ctbrRequiredTxs :: !(Set (TxIn (EraCrypto era)))
   }
   deriving (Generic, Typeable)
 
@@ -253,6 +254,7 @@ instance
         ofield
           (\x tx -> tx {ctbrTreasuryDonation = fromSMaybe zero x})
           (D (decodePositiveCoin $ emptyFailure "Treasury Donation" "non-zero"))
+      bodyFields 23 = field (\x tx -> tx {ctbrRequiredTxs = x}) From
       bodyFields n = field (\_ t -> t) (Invalid n)
       requiredFields :: [(Word, String)]
       requiredFields =
@@ -331,6 +333,7 @@ basicConwayTxBodyRaw =
     (VotingProcedures mempty)
     OSet.empty
     SNothing
+    mempty
     mempty
 
 data ConwayTxBodyUpgradeError c
@@ -417,6 +420,8 @@ instance Crypto c => EraTxBody (ConwayEra c) where
         , ctbProposalProcedures = OSet.empty
         , ctbVotingProcedures = VotingProcedures mempty
         , ctbTreasuryDonation = Coin 0
+        , ctbRequiredTxs = mempty
+        
         }
 
 -- ==========================================
@@ -558,6 +563,7 @@ pattern ConwayTxBody ::
   OSet.OSet (ProposalProcedure era) ->
   StrictMaybe Coin ->
   Coin ->
+  Set (TxIn (EraCrypto era)) ->
   ConwayTxBody era
 pattern ConwayTxBody
   { ctbSpendInputs
@@ -579,6 +585,7 @@ pattern ConwayTxBody
   , ctbProposalProcedures
   , ctbCurrentTreasuryValue
   , ctbTreasuryDonation
+  , ctbRequiredTxs
   } <-
   ( getMemoRawType ->
       ConwayTxBodyRaw
@@ -601,6 +608,7 @@ pattern ConwayTxBody
         , ctbrProposalProcedures = ctbProposalProcedures
         , ctbrCurrentTreasuryValue = ctbCurrentTreasuryValue
         , ctbrTreasuryDonation = ctbTreasuryDonation
+        , ctbrRequiredTxs = ctbRequiredTxs
         }
     )
   where
@@ -623,7 +631,8 @@ pattern ConwayTxBody
       votingProcedures
       proposalProcedures
       currentTreasuryValue
-      treasuryDonation =
+      treasuryDonation
+      reqTxs =
         mkMemoized $
           ConwayTxBodyRaw
             inputsX
@@ -645,6 +654,8 @@ pattern ConwayTxBody
             proposalProcedures
             currentTreasuryValue
             treasuryDonation
+            reqTxs
+
 
 {-# COMPLETE ConwayTxBody #-}
 
@@ -682,6 +693,7 @@ encodeTxBodyRaw ConwayTxBodyRaw {..} =
         !> Omit OSet.null (Key 20 (To ctbrProposalProcedures))
         !> encodeKeyedStrictMaybe 21 ctbrCurrentTreasuryValue
         !> Omit (== mempty) (Key 22 $ To ctbrTreasuryDonation)
+        !> Key 23 (To ctbrRequiredTxs)
 
 instance ConwayEraTxBody era => EncCBOR (ConwayTxBodyRaw era) where
   encCBOR = encode . encodeTxBodyRaw

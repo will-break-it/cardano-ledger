@@ -493,6 +493,7 @@ instance
       <*> arbitrary
       <*> arbitrary
       <*> arbitrary
+      <*> arbitrary
 
 instance
   ( Era era
