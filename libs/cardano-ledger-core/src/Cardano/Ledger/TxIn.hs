@@ -22,6 +22,7 @@ module Cardano.Ledger.TxIn (
   mkTxInPartial,
   txInToText,
   TxIx,
+  Fulfill,
 )
 where
 
@@ -89,6 +90,9 @@ txInToText (TxIn (TxId txidHash) ix) =
 -- | The input of a UTxO.
 data TxIn c = TxIn !(TxId c) {-# UNPACK #-} !TxIx
   deriving (Generic)
+
+-- | The input balancing outputs in validation zone. (babel-fees)
+type Fulfill = TxIn
 
 -- | Construct `TxIn` while throwing an error for an out of range `TxIx`. Make
 -- sure to use it only for testing.
