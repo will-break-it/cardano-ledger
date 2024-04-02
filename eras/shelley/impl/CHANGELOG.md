@@ -1,7 +1,13 @@
 # Version history for `cardano-ledger-shelley`
 
+## 1.10.0.1
+
+*
+
 ## 1.10.0.0
 
+* Remove the `PParams` param from `validateMissingScripts`
+* Remove the `missingScriptsSymmetricDifference` function
 * Add `NFData` instance for `AdaPots`, `ShelleyDelegEvent`
 * Add `Generic`, `Eq` and `NFData` instances for:
   * `ShelleyDelegsEvent`
