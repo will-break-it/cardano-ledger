@@ -21,6 +21,7 @@ module Cardano.Ledger.TxIn (
   TxIn (TxIn),
   mkTxInPartial,
   txInToText,
+  Fulfill,
   TxIx,
 )
 where
@@ -56,6 +57,9 @@ import NoThunks.Class (NoThunks (..))
 newtype TxId c = TxId {unTxId :: SafeHash c EraIndependentTxBody}
   deriving (Show, Eq, Ord, Generic)
   deriving newtype (NoThunks, ToJSON, FromJSON)
+
+-- | A unique ID of a intent transaction, which fulfills/ balances an intent request in the same validation zone.
+type Fulfill = TxId;
 
 _unTxId :: TxId c -> SafeHash c EraIndependentTxBody
 _unTxId = unTxId

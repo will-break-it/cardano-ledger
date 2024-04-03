@@ -71,6 +71,9 @@ transaction_body =
   , ? 20 : proposal_procedures             ; New; Proposal procedures
   , ? 21 : coin                            ; New; current treasury value
   , ? 22 : positive_coin                   ; New; donation
+  , ? 23 : set<intent_fulfill>             ; New; Intent fulfillments
+  , ? 24 : [* intent_request]              ; New; Intent asks/ requests
+  , ? 25 : set<transaction_input>          ; New; Required transactions
   }
 
 voting_procedures = { + voter => { + gov_action_id => voting_procedure } }
@@ -156,6 +159,8 @@ transaction_input = [ transaction_id : $hash32
                     , index : uint
                     ]
 
+intent_fulfill = transaction_input
+
 ; Both of the Alonzo and Babbage style TxOut formats are equally valid
 ; and can be used interchangeably
 transaction_output = pre_babbage_transaction_output / post_alonzo_transaction_output
@@ -172,6 +177,10 @@ post_alonzo_transaction_output =
   , ? 2 : datum_option ; datum option
   , ? 3 : script_ref   ; script reference
   }
+
+intent_request = transaction_output
+
+fulfillment_request_transaction_output = [(intent_fulfill, intent_request)]
 
 script_data_hash = $hash32
 ; This is a hash of data which may affect evaluation of a script.
