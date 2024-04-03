@@ -710,9 +710,9 @@ encodeTxBodyRaw ConwayTxBodyRaw {..} =
         !> Omit OSet.null (Key 20 (To ctbrProposalProcedures))
         !> encodeKeyedStrictMaybe 21 ctbrCurrentTreasuryValue
         !> Omit (== mempty) (Key 22 $ To ctbrTreasuryDonation)
-        !> Omit null (Key 23 (To bftbrFulfills))
-        !> Omit null (Key 24 (To bftbrRequests))
-        !> Omit null (Key 25 (To bftbrRequiredTxs))
+        !> Omit (== mempty) (Key 23 (To bftbrFulfills))
+        !> Omit (== mempty) (Key 24 (To bftbrRequests))
+        !> Omit (== mempty) (Key 25 (To bftbrRequiredTxs))
 
 instance ConwayEraTxBody era => EncCBOR (ConwayTxBodyRaw era) where
   encCBOR = encode . encodeTxBodyRaw
